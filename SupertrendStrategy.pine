@@ -3,15 +3,24 @@ strategy("Supertrend Strategy", overlay=true, default_qty_type=strategy.percent_
 
 atrPeriod = input(10, "ATR Length")
 factor = input.float(3.0, "Factor", step = 0.01)
+maPeriod = input.int(10, "MA Period (pips)")
+
+// compute the moving average across maPeriod
+ma = ta.ema(close, maPeriod)
 
 [_, direction] = ta.supertrend(factor, atrPeriod)
 
-if ta.change(direction) < 0
-    strategy.entry("Supertrend_long_entry", strategy.long)
-    strategy.close("Supertrend_short_entry")
+if ta.change(direction) < 0 and close < ma
+    strategy.entry("long_entry", strategy.long)
+    strategy.close("short_entry")
 
-if ta.change(direction) > 0
-    strategy.entry("Supertrend_short_entry", strategy.short)
-    strategy.close("Supertrend_long_entry")
+if ta.change(direction) > 0 and close > ma
+    strategy.entry("short_entry", strategy.short)
+    strategy.close("long_entry")
 
-//plot(strategy.equity, title="equity", color=color.red, linewidth=2, style=plot.style_areabr)
+// close all entries if ma is crossed
+if (close < ma)
+    strategy.close("long_entry")
+
+if (close > ma)
+    strategy.close("short_entry")
