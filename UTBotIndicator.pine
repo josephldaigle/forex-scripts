@@ -1,0 +1,32 @@
+//@version=4
+("UT Bot Strategy", overlay=true)
+
+src = close 
+ 
+keyvalue = input(3, title="Key Value. 'This changes the sensitivity'", step=.5)
+atrperiod = input(10, title="ATR Period")
+xATR = atr(atrperiod)
+nLoss = keyvalue * xATR
+
+xATRTrailingStop = 0.0
+xATRTrailingStop := iff(src > nz(xATRTrailingStop[1], 0) and src[1] > nz(xATRTrailingStop[1], 0), max(nz(xATRTrailingStop[1]), src - nLoss),
+   iff(src < nz(xATRTrailingStop[1], 0) and src[1] < nz(xATRTrailingStop[1], 0), min(nz(xATRTrailingStop[1]), src + nLoss), 
+   iff(src > nz(xATRTrailingStop[1], 0), src - nLoss, src + nLoss)))
+ 
+pos = 0   
+pos :=  iff(src[1] < nz(xATRTrailingStop[1], 0) and src > nz(xATRTrailingStop[1], 0), 1,
+   iff(src[1] > nz(xATRTrailingStop[1], 0) and src < nz(xATRTrailingStop[1], 0), -1, nz(pos[1], 0))) 
+
+buySignal = crossover(src, xATRTrailingStop)
+sellSignal = crossunder(src, xATRTrailingStop)
+
+if (buySignal)
+    strategy.entry("Buy", strategy.long)
+    
+if (sellSignal)
+    strategy.entry("Sell", strategy.short)
+
+strategy.exit("Exit", "Buy", stop=xATRTrailingStop, limit=na)
+strategy.exit("Exit", "Sell", stop=xATRTrailingStop, limit=na)
+
+plot(xATRTrailingStop, color=pos == -1 ? color.red : pos == 1 ? color.green : color.blue, title="Trailing Stop")

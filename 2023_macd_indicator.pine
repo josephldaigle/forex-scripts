@@ -1,0 +1,14 @@
+//@version=5
+
+// This is a test indicator for practicing pine scripting
+indicator("MACD")
+
+fast = 12 // num candles to assess
+slow = 26 // num candles to assess
+fastMA = ta.ema(close, fast)
+slowMA = ta.ema(close, slow)
+macd = fastMA - slowMA
+signal = ta.ema(macd, 9)
+
+plot(macd, color=color.blue)
+plot(signal, color=color.orange)
