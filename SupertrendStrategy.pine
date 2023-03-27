@@ -10,17 +10,20 @@ ma = ta.ema(close, maPeriod)
 
 [_, direction] = ta.supertrend(factor, atrPeriod)
 
-if ta.change(direction) < 0 and close < ma
+if ta.change(direction) < 0 and ma < close
     strategy.entry("long_entry", strategy.long)
     strategy.close("short_entry")
 
-if ta.change(direction) > 0 and close > ma
+if ta.change(direction) > 0 and ma > close
     strategy.entry("short_entry", strategy.short)
     strategy.close("long_entry")
 
-// close all entries if ma is crossed
+// close all entries if ma is crossed, even if direction doesn't change
 if (close < ma)
     strategy.close("long_entry")
 
 if (close > ma)
     strategy.close("short_entry")
+
+// plot the moving average as an orange line
+plot(ma, color = color.orange, title = "MA")
