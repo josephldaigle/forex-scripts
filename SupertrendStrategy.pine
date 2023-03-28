@@ -1,8 +1,10 @@
 //@version=5
 strategy("Supertrend Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=15)
 
-atrPeriod = input(10, "ATR Length")
+licenseId = "601234567890"
+riskValue = input.int(1, 'Risk Value')
 factor = input.float(3.0, "Factor", step = 0.01)
+atrPeriod = input(10, "ATR Length")
 maPeriod = input.int(10, "MA Period (pips)")
 
 // compute the moving average across maPeriod
@@ -10,20 +12,28 @@ ma = ta.ema(close, maPeriod)
 
 [_, direction] = ta.supertrend(factor, atrPeriod)
 
-if ta.change(direction) < 0 and ma < close
+if ta.change(direction) > 0 and ma < close
+    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sell', alert.freq_once_per_bar_close)
+    alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_long_entry', alert.freq_once_per_bar_close)
+    
     strategy.entry("long_entry", strategy.long)
     strategy.close("short_entry")
 
 if ta.change(direction) > 0 and ma > close
+    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sell', alert.freq_once_per_bar_close)
+    alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_short_entry', alert.freq_once_per_bar_close)
     strategy.entry("short_entry", strategy.short)
     strategy.close("long_entry")
 
-// close all entries if ma is crossed, even if direction doesn't change
-if (close < ma)
-    strategy.close("long_entry")
 
+// close all entries if ma is crossed, even if direction doesn't change
 if (close > ma)
+    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sell', alert.freq_once_per_bar_close)
     strategy.close("short_entry")
+
+if (close < ma)
+    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sell', alert.freq_once_per_bar_close)
+    strategy.close("long_entry")
 
 // plot the moving average as an orange line
 plot(ma, color = color.orange, title = "MA")
