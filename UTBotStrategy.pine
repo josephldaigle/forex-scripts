@@ -3,6 +3,8 @@ strategy("UT Bot Strategy", overlay=true)
 
 src = close 
  
+licenseId = "601234567890"
+riskValue = input.int(1, 'Risk Value') 
 keyvalue = input(3, title="Key Value. 'This changes the sensitivity'", step=.5)
 atrperiod = input(10, title="ATR Period")
 xATR = atr(atrperiod)
@@ -21,9 +23,11 @@ buySignal = crossover(src, xATRTrailingStop)
 sellSignal = crossunder(src, xATRTrailingStop)
 
 if (buySignal)
+    alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=utbot_buy', alert.freq_once_per_bar_close)
     strategy.entry("Buy", strategy.long)
     
 if (sellSignal)
+    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=utbot_sell', alert.freq_once_per_bar_close)
     strategy.entry("Sell", strategy.short)
 
 strategy.exit("Exit", "Buy", stop=xATRTrailingStop, limit=na)
