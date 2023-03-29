@@ -12,7 +12,7 @@ ma = ta.ema(close, maPeriod)
 
 [_, direction] = ta.supertrend(factor, atrPeriod)
 
-if ta.change(direction) > 0 and ma < close
+if ta.change(direction) < 0 and ma < close
     alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sell', alert.freq_once_per_bar_close)
     alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_long_entry', alert.freq_once_per_bar_close)
     
