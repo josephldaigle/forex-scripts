@@ -1,7 +1,7 @@
 //@version=5
 strategy("Supertrend Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=15)
 
-licenseId = "601234567890"
+licenseId = "5997022937301"
 riskValue = input.int(1, 'Risk Value')
 factor = input.float(3.0, "Factor", step = 0.01)
 atrPeriod = input(10, "ATR Length")
