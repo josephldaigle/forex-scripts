@@ -1,12 +1,7 @@
 //@version=5
 strategy("Supertrend Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=15)
 
-<<<<<<< Updated upstream
 licenseId = "5997022937301"
-=======
-// licenseId = "601234567890"
-licenseId = "test"
->>>>>>> Stashed changes
 riskValue = input.int(1, 'Risk Value')
 factor = input.float(3.5, "Factor", step = 0.01)
 atrPeriod = input(9, "ATR Length")
@@ -21,7 +16,6 @@ plot(direction < 0 ? trend : na, title = "Up direction", color = color.green, st
 plot(direction > 0 ? trend : na, title = "Down direction", color = color.red, style=plot.style_linebr)
 
 if ta.change(direction) < 0
-    // alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_sellone', alert.freq_once_per_bar_close)
     alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_long_entry, sl=' + str.tostring(trend), alert.freq_once_per_bar_close)
     strategy.entry("long_entry", strategy.long)
     strategy.close("short_entry")
