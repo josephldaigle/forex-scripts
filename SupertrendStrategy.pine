@@ -1,30 +1,28 @@
 //@version=5
-strategy("Supertrend Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=15)
+strategy('Supertrend Strategy - PineConnector', overlay=true)
 
-licenseId = "5997022937301"
-riskValue = input.int(1, 'Risk Value')
-factor = input.float(3.5, "Factor", step = 0.01)
-atrPeriod = input(9, "ATR Length")
-maPeriod = input.int(50, "MA Period (pips)")
+LicenseID = 5997022937301 // 1. change to your PineConnector License ID (required) 
 
-// compute the moving average across maPeriod
-ma = ta.ema(close, maPeriod)
+atrPeriod = input(10, 'ATR Length') // 2. Change the ATR length/period (optional)  
+factor = input(3, 'Factor') // 3. Change the ATR factor/multiplier (optional)  
+riskvalue = input.int(1, 'Risk Value') // 4. Change the risk value (optional)  
 
-[trend, direction] = ta.supertrend(factor, atrPeriod)
+[supertrend, direction] = ta.supertrend(factor, atrPeriod)
 
-plot(direction < 0 ? trend : na, title = "Up direction", color = color.green, style=plot.style_linebr)
-plot(direction > 0 ? trend : na, title = "Down direction", color = color.red, style=plot.style_linebr)
+bodyMiddle = plot((open + close) / 2, display=display.none)
+upTrend = plot(direction < 0 ? supertrend : na, 'Up Trend', color=color.new(color.green, 0), style=plot.style_linebr)
+downTrend = plot(direction < 0 ? na : supertrend, 'Down Trend', color=color.new(color.red, 0), style=plot.style_linebr)
+
+fill(bodyMiddle, upTrend, color.new(color.green, 90), fillgaps=false)
+fill(bodyMiddle, downTrend, color.new(color.red, 90), fillgaps=false)
 
 if ta.change(direction) < 0
-    alert(licenseId + ',buy,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_long_entry, sl=' + str.tostring(trend), alert.freq_once_per_bar_close)
-    strategy.entry("long_entry", strategy.long)
-    strategy.close("short_entry")
-    
+    strategy.entry('My Long Entry Id', strategy.long)
+    alert(str.tostring(LicenseID)+',buy,' + syminfo.ticker + ',sl=' + str.tostring(supertrend) + ',risk=' + str.tostring(riskvalue), alert.freq_once_per_bar_close)
+
 if ta.change(direction) > 0
-    alert(licenseId + ',sell,' + syminfo.ticker + ',risk=' + str.tostring(riskValue) + ',signal=supertrend_short_entry, sl=' + str.tostring(trend), alert.freq_once_per_bar_close)
-    strategy.entry("short_entry", strategy.short)
-    strategy.close("long_entry")
+    strategy.entry('My Short Entry Id', strategy.short)
+    alert(str.tostring(LicenseID)+',sell,' + syminfo.ticker + ',sl=' + str.tostring(supertrend) + ',risk=' + str.tostring(riskvalue), alert.freq_once_per_bar_close)
 
-
-// plot the moving average as an orange line
-plot(ma, color = color.orange, title = "MA")
+plotshape(ta.change(direction) < 0, style=shape.labelup, location=location.belowbar, color=color.new(#046ff9, 0), size=size.large, text='PineConnector \n Buy', textcolor=color.new(color.white, 0))
+plotshape(ta.change(direction) > 0, style=shape.labeldown, location=location.abovebar, color=color.new(#046ff9, 0), size=size.large, text='PineConnector \n Sell', textcolor=color.new(color.white, 0))
